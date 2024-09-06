@@ -6,10 +6,13 @@ import { PriceService } from './price/price.service';
 import { PriceController } from './price/price.controller';
 import { PriceEntity } from './price/price.entity';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { PriceModule } from './price/price.module';
 
 @Module({
   imports: [
     HttpModule, // Add HttpModule here
+    PriceModule, // Ensure PriceModule is imported here
+
     TypeOrmModule.forRoot({
       type: 'postgres', // or your chosen RDBMS
       host: 'localhost',
@@ -19,7 +22,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
       database: 'price_tracker',
       entities: [PriceEntity],
       synchronize: true,
-    }), MailerModule.forRoot({
+    }),
+    MailerModule.forRoot({
       transport: {
         host: process.env.SMTP_HOST,
         port: 587,

@@ -7,6 +7,7 @@ import { PriceEntity } from './price.entity';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { MailerService } from '@nestjs-modules/mailer';
 import { MoreThanOrEqual } from 'typeorm';
+import { AlertEntity } from './alert.entity';
 
 @Injectable()
 export class PriceService {
@@ -15,6 +16,8 @@ export class PriceService {
     private readonly mailerService: MailerService,
     @InjectRepository(PriceEntity)
     private readonly priceRepository: Repository<PriceEntity>,
+    @InjectRepository(AlertEntity)
+    private readonly alertRepository: Repository<AlertEntity>, // Ensure this is correct
   ) {}
 
   // Fetch prices from Moralis or Solscan API
@@ -70,6 +73,12 @@ export class PriceService {
   }
   // Set price alert
   async setPriceAlert(chain: string, dollar: number, email: string) {
-    // Store alert in database or in-memory data structure
+    const alert = this.alertRepository.create({
+      chain,
+      dollar,
+      email,
+    });
+
+    await this.alertRepository.save(alert);
   }
 }
