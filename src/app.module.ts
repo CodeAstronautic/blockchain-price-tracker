@@ -1,26 +1,32 @@
 // src/app.module.ts
 import { Module } from '@nestjs/common';
-import { HttpModule } from '@nestjs/axios'; // Import HttpModule
+import { ConfigModule } from '@nestjs/config';
+import { HttpModule } from '@nestjs/axios';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PriceService } from './price/price.service';
 import { PriceController } from './price/price.controller';
-import { PriceEntity } from './price/price.entity';
+import { PriceEntity, PriceAlertEntity } from './price/price.entity';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { PriceModule } from './price/price.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
-    HttpModule, // Add HttpModule here
-    PriceModule, // Ensure PriceModule is imported here
+    ConfigModule.forRoot({
+      isGlobal: true, // Makes the config module global so you don't have to import it elsewhere
+    }),
+    ScheduleModule.forRoot(),
+    HttpModule,
+    PriceModule,
 
     TypeOrmModule.forRoot({
-      type: 'postgres', // or your chosen RDBMS
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'admin',
-      database: 'price_tracker',
-      entities: [PriceEntity],
+      type: 'postgres',
+      host: process.env.HOST_NAME,
+      port: Number(process.env.DB_PORT),
+      username: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      entities: [PriceEntity, PriceAlertEntity],
       synchronize: true,
     }),
     MailerModule.forRoot({
@@ -33,7 +39,7 @@ import { PriceModule } from './price/price.module';
         },
       },
     }),
-    TypeOrmModule.forFeature([PriceEntity]),
+    TypeOrmModule.forFeature([PriceEntity, PriceAlertEntity]),
   ],
   controllers: [PriceController],
   providers: [PriceService],
