@@ -1,14 +1,15 @@
 // src/price/price.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { HttpModule } from '@nestjs/axios'; // Import HttpModule
 import { PriceService } from './price.service';
 import { PriceController } from './price.controller';
-import { PriceEntity } from './price.entity';
-import { AlertEntity } from './alert.entity'; // Import AlertEntity
+import { PriceEntity, PriceAlertEntity } from './price.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([PriceEntity, AlertEntity]), // Ensure AlertEntity is included here
+    TypeOrmModule.forFeature([PriceEntity, PriceAlertEntity]), // Include your entities here
+    HttpModule, // Import HttpModule to make HttpService available
   ],
   providers: [PriceService],
   controllers: [PriceController],
